@@ -39,7 +39,7 @@ class CoinGeckoMonteCarloSimulation:
                 prices = [entry[1] for entry in data['prices']]
                 return prices
             else:
-                print(f"Failed to fetch data. Status code: {response.status_code}-> Client application has surpassed its rate limit, or number of requests they can send in a given period of time.")
+                print(f"Failed to fetch data. Status code: {response.status_code}")
                 return None
         except requests.exceptions.RequestException as e:
             print(f"Error during API request: {e}")
@@ -64,12 +64,11 @@ class CoinGeckoMonteCarloSimulation:
         """
         returns = []
         for _ in range(self.num_simulations):
-            random_log_returns = np.random.normal(log_returns.mean(), log_returns.std(), size=investment_horizon * 365)
+            random_log_returns = np.random.normal(log_returns.mean(), log_returns.std(), size=investment_horizon)
             future_values = np.exp(np.cumsum(random_log_returns))
             final_value = principal_amount * future_values[-1]
             returns.append(final_value)
         return returns
-
 
     def visualize_simulation_results(self, total_average_simulations):
         """
@@ -86,7 +85,6 @@ class CoinGeckoMonteCarloSimulation:
         plt.grid(True)
         plt.show()
 
-
     def run_simulation_and_get_results(self):
         """
         Runs simulations and returns the results as a string.
@@ -99,13 +97,14 @@ class CoinGeckoMonteCarloSimulation:
             results = []
 
             for i, average_future_value in enumerate(total_average_simulations):
-                results.append(f"Average future values of the investment for Monte Carlo Simulation {i + 1}: {average_future_value:.2f}")
+                results.append(f"Average future values of the investment for Monte Carlo Simulation {i + 1}: \n{average_future_value:.2f}")
 
-            results.append(f"Total average of {self.num_simulations} Monte Carlo simulations: {np.mean(total_average_simulations):.2f}")
+            results.append(f"Total average of {self.num_simulations} Monte Carlo simulations: \n{np.mean(total_average_simulations):.2f}")
 
             # self.visualize_simulation_results(total_average_simulations)
-            result = '\n'.join(results)
-            return result
+            # result = '\n'.join(results)
+            
+            return results
 
         else:
             return "Simulation aborted due to errors"
@@ -119,5 +118,5 @@ if __name__ == "__main__":
     # num_simulations = int(input("Enter the number of Monte Carlo simulations: "))
 
     # run_simulation_and_print_results(coin_id, years, principal_amount, investment_horizon, num_simulations)
-    monte_carlo = CoinGeckoMonteCarloSimulation("ethereum", 4, 1000, 2, 10)
+    monte_carlo = CoinGeckoMonteCarloSimulation("solana", 3, 1000, 2, 10)
     print(monte_carlo.run_simulation_and_get_results())
