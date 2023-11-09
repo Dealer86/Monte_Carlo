@@ -21,7 +21,7 @@
         <input type="text" name="{{ form.coin_id.name }}" class="form-control" placeholder="Cryptocurrency Symbol">
     
         <i class="fas fa-calendar"></i>    
-        <input type="number" name="{{ form.years.name }}" class="form-control" placeholder="Years of Historical Data">
+        <input type="number" name="{{ form.years.name }}" class="form-control" placeholder="Years of Historical Data to use starting from today">
     
         <i class="fas fa-dollar-sign"></i>        
         <input type="number" name="{{ form.principal_amount.name }}" class="form-control" placeholder="Initial Principal Amount">
@@ -33,6 +33,13 @@
         <input type="number" name="{{ form.num_simulations.name }}" class="form-control" placeholder="Number of Monte Carlo Simulations">
         <br>
         <button type="submit" class="btn btn-primary">Run Simulation</button>
+        {% if  messages %}
+          {% for message in messages %}
+
+            {{message}}
+
+          {% endfor %}
+          {% endif %}
       </form>
 
     </div>
@@ -57,6 +64,8 @@
       {% for result in results %}
         <div class="container text-center mt-2 custom-container2">
           {{ result }}
+
+          
         </div>
       {% endfor %}
       
