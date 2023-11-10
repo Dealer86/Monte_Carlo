@@ -25,7 +25,7 @@ def montecarlo(request):
             return render(request, 'simulation/montecarlo.html', {'form': form, 'results': results})
         
         else:
-            messages.error(request, "Fill all tabs in form before running simulation")
+            messages.error(request, "Fill all tabs before running simulation!")
     else:
         form = MonteCarloForm()
     return render(request, 'simulation/montecarlo.html', {'form': form})
