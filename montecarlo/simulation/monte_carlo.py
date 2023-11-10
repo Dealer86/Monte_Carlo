@@ -12,7 +12,7 @@ class CoinGeckoMonteCarloSimulation:
         self.investment_horizon = investment_horizon
         self.num_simulations = num_simulations
 
-    def __fetch_price_data(self, coin_id, years):
+    def fetch_price_data(self, coin_id, years):
         """
         Fetches historical cryptocurrency price data from CoinGecko API.
 
@@ -73,6 +73,39 @@ class CoinGeckoMonteCarloSimulation:
             returns.append(final_value)
         return returns
 
+    
+
+    def run_simulation(self):
+        """
+        Runs simulations and returns the results as a string.
+        """
+        prices = self.fetch_price_data(self.coin_id, self.years)
+        if prices is not None:
+            log_returns = self.calculate_log_returns(prices)
+            total_average_simulations = self.monte_carlo_simulation(log_returns, self.principal_amount, self.investment_horizon)
+            return total_average_simulations
+            
+
+        else:
+            print(f"Failed to run simulation")
+            return []
+
+    def get_simulations_results(self):
+        results = []
+        if self.run_simulation():
+            for i, average_future_value in enumerate(self.run_simulation()):
+                results.append(f"Average future values of the investment for Monte Carlo Simulation {i + 1}: {average_future_value:.2f}$")
+
+            results.append(f"Total average of {self.num_simulations} Monte Carlo simulations: {np.mean(self.run_simulation()):.2f}$")
+
+            # self.visualize_simulation_results(total_average_simulations)
+            # result = '\n'.join(results)
+            
+            return results
+        else:
+            print(f"Simulation failed getting results")
+            return []
+
     def visualize_simulation_results(self, total_average_simulations):
         """
         Visualizes the results of the Monte Carlo simulations as a histogram.
@@ -88,30 +121,6 @@ class CoinGeckoMonteCarloSimulation:
         plt.grid(True)
         plt.show()
 
-    def run_simulation_and_get_results(self):
-        """
-        Runs simulations and returns the results as a string.
-        """
-        prices = self.__fetch_price_data(self.coin_id, self.years)
-        if prices is not None:
-            log_returns = self.calculate_log_returns(prices)
-            total_average_simulations = self.monte_carlo_simulation(log_returns, self.principal_amount, self.investment_horizon)
-
-            results = []
-            if total_average_simulations:
-                for i, average_future_value in enumerate(total_average_simulations):
-                    results.append(f"Average future values of the investment for Monte Carlo Simulation {i + 1}: \n{average_future_value:.2f}$")
-
-                results.append(f"Total average of {self.num_simulations} Monte Carlo simulations: \n{np.mean(total_average_simulations):.2f}$")
-
-                # self.visualize_simulation_results(total_average_simulations)
-                # result = '\n'.join(results)
-                
-                return results
-
-        else:
-            print(f"Failed to run simulation")
-            return []
 
 
 if __name__ == "__main__":
@@ -122,6 +131,6 @@ if __name__ == "__main__":
     # num_simulations = int(input("Enter the number of Monte Carlo simulations: "))
 
     # run_simulation_and_print_results(coin_id, years, principal_amount, investment_horizon, num_simulations)
-    # monte_carlo = CoinGeckoMonteCarloSimulation("solana", 3, 1000, 2, 10)
-    # print(monte_carlo.run_simulation_and_get_results())
-    pass
+    monte_carlo = CoinGeckoMonteCarloSimulation("solana", 3, 1000, 2, 10)
+    print(monte_carlo.get_total_average_simulations_results())
+    
