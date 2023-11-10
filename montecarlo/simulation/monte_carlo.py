@@ -106,20 +106,44 @@ class CoinGeckoMonteCarloSimulation:
             print(f"Simulation failed getting results")
             return []
 
-    def visualize_simulation_results(self, total_average_simulations):
-        """
-        Visualizes the results of the Monte Carlo simulations as a histogram.
 
-        Args:
-            total_average_simulations (list): List of average future values from the simulations.
-        """
-        plt.figure(figsize=(10, 6))
-        plt.hist(total_average_simulations, bins=20, color='blue', alpha=0.7)
-        plt.title('Monte Carlo Simulation Results')
-        plt.xlabel('Average Future Value')
-        plt.ylabel('Frequency')
-        plt.grid(True)
+    def visualize_simulation(self):
+        average_future_values = self.run_simulation()
+        simulation_number = list(range(1, len(average_future_values) + 1))
+
+        average_future_value_df = pd.DataFrame({
+            "Simulation Number": simulation_number,
+            "Average Future Value": average_future_values
+        })
+
+        # Create a figure with two subplots
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6))
+
+        # Plot the bar chart in the first subplot
+        average_future_value_df.plot.barh(y="Average Future Value", x="Simulation Number", legend=False, ax=ax1)
+        ax1.set_xlabel('Average Future Value')
+        ax1.set_ylabel('Simulation Number')
+        ax1.grid(True)
+
+        # Display additional information in the second subplot (side tab)
+        tab_info = (
+            f"Cryptocurrency: {self.coin_id.capitalize()}\n"
+            f"Years of Price Data Collected: {self.years}\n"
+            f"Principal amount: {self.principal_amount}$\n"
+            f"Investment Horizon: {self.investment_horizon} days\n"
+            f"Number of Simulations: {self.num_simulations}\n"
+            f"Average of all Monte Carlo Simulations: {np.mean(self.run_simulation()):.2f}$"
+        )
+
+        ax2.text(0.1, 0.5, tab_info, fontsize=12, verticalalignment='center')
+        ax2.axis('off')  # Hide axis for the side tab
+
+        # Set the main title for the entire figure
+        fig.suptitle("Monte Carlo Simulations", fontsize=16)
+
         plt.show()
+
+
 
 
 
@@ -131,6 +155,7 @@ if __name__ == "__main__":
     # num_simulations = int(input("Enter the number of Monte Carlo simulations: "))
 
     # run_simulation_and_print_results(coin_id, years, principal_amount, investment_horizon, num_simulations)
-    monte_carlo = CoinGeckoMonteCarloSimulation("solana", 3, 1000, 2, 10)
-    print(monte_carlo.get_total_average_simulations_results())
+    monte_carlo = CoinGeckoMonteCarloSimulation("solana", 3, 1000, 100, 50)
+    # monte_carlo.visualize_average_future_value()
+    monte_carlo.visualize_simulation()
     
