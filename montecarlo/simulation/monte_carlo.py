@@ -118,9 +118,11 @@ class CoinGeckoMonteCarloSimulation:
             "Simulation Number": simulation_number,
             "Average Future Value": average_future_values
         })
-
+        if len(simulation_number) >= 50:
         # Create a figure with a single subplot
-        fig, ax = plt.subplots(figsize=(14, 12))
+            fig, ax = plt.subplots(figsize=(14, len(simulation_number) / 4))
+        else:
+            fig, ax = plt.subplots(figsize=(14, 12))
 
         # Plot the bar chart
         average_future_value_df.plot.barh(y="Average Future Value", x="Simulation Number", legend=False, ax=ax)
@@ -128,18 +130,24 @@ class CoinGeckoMonteCarloSimulation:
         ax.set_ylabel('Simulation Number')
         ax.grid(True)
 
+        below_condition = average_future_value_df['Average Future Value'] >= self.principal_amount
+        simulations_above_principal_amount = average_future_value_df[below_condition]['Average Future Value'].count()
+
         # Display additional information as text
         tab_info = (
-            f"Cryptocurrency: {self.coin_id.capitalize()}",
+            f"Minimum of all Monte Carlo Simulations: {average_future_value_df['Average Future Value'].min():.2f}$",
+            f"Maximum of all Monte Carlo Simulations: {average_future_value_df['Average Future Value'].max():.2f}$",
+            f"Average of all Monte Carlo Simulations: {np.mean(average_future_value_df['Average Future Value']):.2f}$",
+            f"Simulations above principal amount: {simulations_above_principal_amount}",
             f"Years of Price Data Collected: {self.years} years",
-            f"Principal amount: {self.principal_amount}$",
-            f"Investment Horizon: {self.investment_horizon} days",
             f"Number of Simulations: {self.num_simulations}",
-            f"Average of all Monte Carlo Simulations: {np.mean(self.run_simulation()):.2f}$"
+            f"Investment Horizon: {self.investment_horizon} days",
+            f"Principal amount: {self.principal_amount}$",
+            f"Cryptocurrency: {self.coin_id.capitalize()}",
         )
 
         # Add text annotations to the top of the plot
-        spacing = 0.02  # Adjust this value as needed
+        spacing = 0.014  # Adjust this value as needed
         for i, line in enumerate(tab_info):
             ax.annotate(line, xy=(0.5, 1.02 + spacing * (i + 1)), xycoords='axes fraction',
                         ha='center', va='center', fontsize=14)
