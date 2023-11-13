@@ -128,7 +128,7 @@ class CoinGeckoMonteCarloSimulation:
         ax.set_ylabel('Simulation Number')
         ax.grid(True)
 
-        # Display additional information as text on the left side of the main graph
+        # Display additional information as text
         tab_info = (
             f"Cryptocurrency: {self.coin_id.capitalize()}",
             f"Years of Price Data Collected: {self.years} years",
@@ -138,7 +138,7 @@ class CoinGeckoMonteCarloSimulation:
             f"Average of all Monte Carlo Simulations: {np.mean(self.run_simulation()):.2f}$"
         )
 
-        # Add text annotations to the left of the plot
+        # Add text annotations to the top of the plot
         spacing = 0.02  # Adjust this value as needed
         for i, line in enumerate(tab_info):
             ax.annotate(line, xy=(0.5, 1.02 + spacing * (i + 1)), xycoords='axes fraction',
