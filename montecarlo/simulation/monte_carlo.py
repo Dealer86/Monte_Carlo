@@ -3,6 +3,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime
+import mpld3
+
 
 class CoinGeckoMonteCarloSimulation:
     def __init__(self, coin_id: str, years_of_price_data_to_collect_starting_from_current_year: int, principal_amount: float, investment_horizon: int, num_simulations: int ):
@@ -92,6 +94,7 @@ class CoinGeckoMonteCarloSimulation:
 
     def get_simulations_results(self):
         results = []
+        image_path = 'static/simulation/monte_carlo.png'
         if self.run_simulation():
             for i, average_future_value in enumerate(self.run_simulation()):
                 results.append(f"Average future values of the investment for Monte Carlo Simulation {i + 1}: {average_future_value:.2f}$")
@@ -101,7 +104,7 @@ class CoinGeckoMonteCarloSimulation:
             # self.visualize_simulation_results(total_average_simulations)
             # result = '\n'.join(results)
             
-            return results
+            return results, image_path
         else:
             print(f"Simulation failed getting results")
             return []
@@ -116,32 +119,38 @@ class CoinGeckoMonteCarloSimulation:
             "Average Future Value": average_future_values
         })
 
-        # Create a figure with two subplots
-        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6))
+        # Create a figure with a single subplot
+        fig, ax = plt.subplots(figsize=(14, 12))
 
-        # Plot the bar chart in the first subplot
-        average_future_value_df.plot.barh(y="Average Future Value", x="Simulation Number", legend=False, ax=ax1)
-        ax1.set_xlabel('Average Future Value')
-        ax1.set_ylabel('Simulation Number')
-        ax1.grid(True)
+        # Plot the bar chart
+        average_future_value_df.plot.barh(y="Average Future Value", x="Simulation Number", legend=False, ax=ax)
+        ax.set_xlabel('Average Future Value')
+        ax.set_ylabel('Simulation Number')
+        ax.grid(True)
 
-        # Display additional information in the second subplot (side tab)
+        # Display additional information as text on the left side of the main graph
         tab_info = (
-            f"Cryptocurrency: {self.coin_id.capitalize()}\n"
-            f"Years of Price Data Collected: {self.years}\n"
-            f"Principal amount: {self.principal_amount}$\n"
-            f"Investment Horizon: {self.investment_horizon} days\n"
-            f"Number of Simulations: {self.num_simulations}\n"
+            f"Cryptocurrency: {self.coin_id.capitalize()}",
+            f"Years of Price Data Collected: {self.years} years",
+            f"Principal amount: {self.principal_amount}$",
+            f"Investment Horizon: {self.investment_horizon} days",
+            f"Number of Simulations: {self.num_simulations}",
             f"Average of all Monte Carlo Simulations: {np.mean(self.run_simulation()):.2f}$"
         )
 
-        ax2.text(0.1, 0.5, tab_info, fontsize=12, verticalalignment='center')
-        ax2.axis('off')  # Hide axis for the side tab
+        # Add text annotations to the left of the plot
+        spacing = 0.02  # Adjust this value as needed
+        for i, line in enumerate(tab_info):
+            ax.annotate(line, xy=(0.5, 1.02 + spacing * (i + 1)), xycoords='axes fraction',
+                        ha='center', va='center', fontsize=14)
+            
+        # Convert the Matplotlib figure to HTML using mpld3
+        graph_html = mpld3.fig_to_html(fig)
+        return graph_html
 
-        # Set the main title for the entire figure
-        fig.suptitle("Monte Carlo Simulations", fontsize=16)
-
-        plt.show()
+        
+        
+        
 
 
 
@@ -155,7 +164,7 @@ if __name__ == "__main__":
     # num_simulations = int(input("Enter the number of Monte Carlo simulations: "))
 
     # run_simulation_and_print_results(coin_id, years, principal_amount, investment_horizon, num_simulations)
-    monte_carlo = CoinGeckoMonteCarloSimulation("solana", 3, 1000, 100, 50)
+    monte_carlo = CoinGeckoMonteCarloSimulation("solana", 1, 1000, 100, 23)
     # monte_carlo.visualize_average_future_value()
     monte_carlo.visualize_simulation()
     
