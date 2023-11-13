@@ -1,8 +1,8 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .forms import MonteCarloForm
 from .monte_carlo import CoinGeckoMonteCarloSimulation
 from django.contrib import messages
-
+import mpld3
 
 def montecarlo(request):
     if request.method == 'POST':
@@ -18,11 +18,13 @@ def montecarlo(request):
 
             monte_carlo = CoinGeckoMonteCarloSimulation(
                 coin_id, years, principal_amount, investment_horizon, num_simulations)
-            results = monte_carlo.get_simulations_results()
-
-            if not results:
-                messages.error(request, f"Cryptocurrency symbol {coin_id} is not a valid! Try again ...")    
-            return render(request, 'simulation/montecarlo.html', {'form': form, 'results': results})
+            try:
+                graph_html = monte_carlo.visualize_simulation()
+            except IndexError:
+                messages.error(request, f"Cryptocurrency symbol {coin_id} is not a valid! Try again ...") 
+                return redirect('montecarlo')
+            
+            return render(request, 'simulation/montecarlo.html', {'form': form, "graph_html": graph_html})
         
         else:
             messages.error(request, "Fill all tabs before running simulation!")
