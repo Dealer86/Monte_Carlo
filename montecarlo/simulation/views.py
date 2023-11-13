@@ -20,11 +20,12 @@ def montecarlo(request):
                 coin_id, years, principal_amount, investment_horizon, num_simulations)
             try:
                 graph_html = monte_carlo.visualize_simulation()
+                history_html = monte_carlo.visualize_history_graph()
             except IndexError:
                 messages.error(request, f"Cryptocurrency symbol {coin_id} is not a valid! Try again ...") 
                 return redirect('montecarlo')
             
-            return render(request, 'simulation/montecarlo.html', {'form': form, "graph_html": graph_html})
+            return render(request, 'simulation/montecarlo.html', {'form': form, "graph_html": graph_html, 'history_html': history_html})
         
         else:
             messages.error(request, "Fill all tabs before running simulation!")
