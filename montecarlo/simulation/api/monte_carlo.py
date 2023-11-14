@@ -35,10 +35,10 @@ class CoinGeckoMonteCarloSimulation:
         """
         try:
             # Calculate the number of data points based on the interval
-            num_data_points = years * 365
+            days = years * 365
 
             # Fetch historical price data from the CoinGecko API
-            url = f"https://api.coingecko.com/api/v3/coins/{coin_id}/market_chart?vs_currency=usd&days={num_data_points}"
+            url = f"https://api.coingecko.com/api/v3/coins/{coin_id}/market_chart?vs_currency=usd&days={days}"
             response = requests.get(url)
 
             if response.status_code == 200:
