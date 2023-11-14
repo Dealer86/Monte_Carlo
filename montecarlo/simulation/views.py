@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect
 from .forms import MonteCarloForm
-from .monte_carlo import CoinGeckoMonteCarloSimulation
+from .api.monte_carlo import CoinGeckoMonteCarloSimulation
 from django.contrib import messages
-import mpld3
+
 
 def montecarlo(request):
     if request.method == 'POST':
