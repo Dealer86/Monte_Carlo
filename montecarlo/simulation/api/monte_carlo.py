@@ -7,13 +7,19 @@ import mpld3
 
 
 class CoinGeckoMonteCarloSimulation:
-    def __init__(self, coin_id: str, years_of_price_data_to_collect_starting_from_current_year: int, principal_amount: float, investment_horizon: int, num_simulations: int):
+    def __init__(
+        self,
+        coin_id: str,
+        years_of_price_data_to_collect_starting_from_current_year: int,
+        principal_amount: float,
+        investment_horizon: int,
+        num_simulations: int,
+    ):
         self.coin_id = coin_id
         self.years = years_of_price_data_to_collect_starting_from_current_year
         self.principal_amount = principal_amount
         self.investment_horizon = investment_horizon
         self.num_simulations = num_simulations
-        
 
     def fetch_price_data(self, coin_id, years, return_timestamps: bool = False):
         """
@@ -30,18 +36,21 @@ class CoinGeckoMonteCarloSimulation:
         try:
             # Calculate the number of data points based on the interval
             num_data_points = years * 365
-            
+
             # Fetch historical price data from the CoinGecko API
-            url = f'https://api.coingecko.com/api/v3/coins/{coin_id}/market_chart?vs_currency=usd&days={num_data_points}'
+            url = f"https://api.coingecko.com/api/v3/coins/{coin_id}/market_chart?vs_currency=usd&days={num_data_points}"
             response = requests.get(url)
-            
+
             if response.status_code == 200:
                 data = response.json()
-                
+
                 # Extract prices from the response
-                prices = [entry[1] for entry in data['prices']]
+                prices = [entry[1] for entry in data["prices"]]
                 timestamp_in_milliseconds = [e[0] for e in data["prices"]]
-                timestamps = [datetime.fromtimestamp(ts / 1000) for ts in timestamp_in_milliseconds]
+                timestamps = [
+                    datetime.fromtimestamp(ts / 1000)
+                    for ts in timestamp_in_milliseconds
+                ]
                 # print(timestamps)
                 if not return_timestamps:
                     return prices
@@ -57,7 +66,6 @@ class CoinGeckoMonteCarloSimulation:
             print(f"Error while processing data: {e}")
             return None
 
-
     def calculate_log_returns(self, prices) -> pd.Series:
         """
         Calculates logarithmic returns from a list of prices.
@@ -67,13 +75,15 @@ class CoinGeckoMonteCarloSimulation:
 
         Returns:
             pd.Series: Logarithmic returns.
-       
+
         """
         price_df = pd.Series(prices)
         log_returns = np.log(price_df / price_df.shift(1))
         return log_returns.dropna()
 
-    def monte_carlo_simulation(self, log_returns, principal_amount, investment_horizon) -> list:
+    def monte_carlo_simulation(
+        self, log_returns, principal_amount, investment_horizon
+    ) -> list:
         """
         Performs Monte Carlo simulations for future value prediction of a cryptocurrency investment.
 
@@ -87,14 +97,15 @@ class CoinGeckoMonteCarloSimulation:
         """
         returns = []
         for _ in range(self.num_simulations):
-            random_log_returns = np.random.normal(log_returns.mean(), log_returns.std(), size=investment_horizon)
+            random_log_returns = np.random.normal(
+                log_returns.mean(), log_returns.std(), size=investment_horizon
+            )
             future_values = np.exp(np.cumsum(random_log_returns))
             final_value = principal_amount * future_values[-1]
             returns.append(final_value)
         return returns
 
-    
-    def run_simulation(self)-> list:
+    def run_simulation(self) -> list:
         """
         Runs simulations and returns the results.
 
@@ -104,43 +115,51 @@ class CoinGeckoMonteCarloSimulation:
         prices = self.fetch_price_data(self.coin_id, self.years)
         if prices is not None:
             log_returns = self.calculate_log_returns(prices)
-            total_average_simulations = self.monte_carlo_simulation(log_returns, self.principal_amount, self.investment_horizon)
+            total_average_simulations = self.monte_carlo_simulation(
+                log_returns, self.principal_amount, self.investment_horizon
+            )
             return total_average_simulations
-            
 
         else:
             print(f"Failed to run simulation")
             return []
 
-
     def visualize_simulation(self) -> str:
         """
         Visualizes Monte Carlo simulation results and additional information.
-        
+
         Returns:
             str: HTML representation of the simulation visualization.
         """
         average_future_values = self.run_simulation()
         simulation_number = list(range(1, len(average_future_values) + 1))
 
-        average_future_value_df = pd.DataFrame({
-            "Simulation Number": simulation_number,
-            "Average Future Value": average_future_values
-        })
+        average_future_value_df = pd.DataFrame(
+            {
+                "Simulation Number": simulation_number,
+                "Average Future Value": average_future_values,
+            }
+        )
         if len(simulation_number) >= 50:
-        # Create a figure with a single subplot
+            # Create a figure with a single subplot
             fig, ax = plt.subplots(figsize=(14, len(simulation_number) / 4))
         else:
             fig, ax = plt.subplots(figsize=(14, 12))
 
         # Plot the bar chart
-        average_future_value_df.plot.barh(y="Average Future Value", x="Simulation Number", legend=False, ax=ax)
-        ax.set_xlabel('Average Future Value')
-        ax.set_ylabel('Simulation Number')
+        average_future_value_df.plot.barh(
+            y="Average Future Value", x="Simulation Number", legend=False, ax=ax
+        )
+        ax.set_xlabel("Average Future Value")
+        ax.set_ylabel("Simulation Number")
         ax.grid(True)
 
-        below_condition = average_future_value_df['Average Future Value'] >= self.principal_amount
-        simulations_above_principal_amount = average_future_value_df[below_condition]['Average Future Value'].count()
+        below_condition = (
+            average_future_value_df["Average Future Value"] >= self.principal_amount
+        )
+        simulations_above_principal_amount = average_future_value_df[below_condition][
+            "Average Future Value"
+        ].count()
 
         # Display additional information as text
         tab_info = (
@@ -158,22 +177,29 @@ class CoinGeckoMonteCarloSimulation:
         # Add text annotations to the top of the plot
         spacing = 0.014  # Adjust this value as needed
         for i, line in enumerate(tab_info):
-            ax.annotate(line, xy=(0.5, 1.02 + spacing * (i + 1)), xycoords='axes fraction',
-                        ha='center', va='center', fontsize=14)
-            
+            ax.annotate(
+                line,
+                xy=(0.5, 1.02 + spacing * (i + 1)),
+                xycoords="axes fraction",
+                ha="center",
+                va="center",
+                fontsize=14,
+            )
+
         # Convert the Matplotlib figure to HTML using mpld3
         graph_html = mpld3.fig_to_html(fig)
         return graph_html
 
-
     def visualize_history_graph(self) -> str:
         """
         Visualizes the historical price data graph along with additional information.
-        
+
         Returns:
             str: HTML representation of the history graph visualization.
         """
-        timestamps, prices = self.fetch_price_data(coin_id=self.coin_id, years=self.years, return_timestamps=True)
+        timestamps, prices = self.fetch_price_data(
+            coin_id=self.coin_id, years=self.years, return_timestamps=True
+        )
         history_graph = pd.DataFrame({"Timestamps": timestamps, "Prices": prices})
 
         # Plotting using Matplotlib
@@ -183,18 +209,18 @@ class CoinGeckoMonteCarloSimulation:
         ax.set_ylabel("Prices in $")
         ax.grid(True)
 
-        min_price = history_graph['Prices'].min()
-        max_price = history_graph['Prices'].max()
-        average_price = history_graph['Prices'].mean()
+        min_price = history_graph["Prices"].min()
+        max_price = history_graph["Prices"].max()
+        average_price = history_graph["Prices"].mean()
 
         # Find the index of the maximum value in the 'Prices' column
-        max_price_index = history_graph['Prices'].idxmax()
-        min_price_index = history_graph['Prices'].idxmin()
+        max_price_index = history_graph["Prices"].idxmax()
+        min_price_index = history_graph["Prices"].idxmin()
 
         # Use the index to get the corresponding timestamp
-        timestamp_max_price = history_graph.loc[max_price_index, 'Timestamps']
-        timestamp_min_price = history_graph.loc[min_price_index, 'Timestamps']
-        
+        timestamp_max_price = history_graph.loc[max_price_index, "Timestamps"]
+        timestamp_min_price = history_graph.loc[min_price_index, "Timestamps"]
+
         # Add extra information at the top of the graph
         extra_info = [
             f"Cryptocurrency: {self.coin_id.capitalize()}",
@@ -209,7 +235,15 @@ class CoinGeckoMonteCarloSimulation:
 
         # Iterate over each line of text and place it on a different row
         for line in extra_info:
-            ax.text(0.5, y_coord, line, transform=ax.transAxes, ha='center', va='center', fontsize=14)
+            ax.text(
+                0.5,
+                y_coord,
+                line,
+                transform=ax.transAxes,
+                ha="center",
+                va="center",
+                fontsize=14,
+            )
             y_coord -= 0.02  # Adjust this value to control the spacing between rows
 
         # Convert the Matplotlib figure to HTML using mpld3
@@ -218,7 +252,7 @@ class CoinGeckoMonteCarloSimulation:
 
         return history_html
 
-        
+
 if __name__ == "__main__":
     # coin_id = str(input("Enter the cryptocurrency symbol: "))
     # years = int(input("Enter the number of years of historical data to consider: "))
@@ -231,4 +265,3 @@ if __name__ == "__main__":
     # monte_carlo.visualize_average_future_value()
     # monte_carlo.visualize_simulation()
     monte_carlo.visualize_history_graph()
-    
