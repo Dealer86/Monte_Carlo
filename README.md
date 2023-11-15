@@ -39,8 +39,8 @@ Monte Carlo is a simulation and uses CoinGecko API. This fintech app fetches his
 - **GitHub Actions Status Badge** [![Django CI](https://github.com/Dealer86/Monte_Carlo/actions/workflows/django.yml/badge.svg)](https://github.com/Dealer86/Monte_Carlo/actions/workflows/django.yml)
 
 ### Third-Party Tools
-- **OBS**: Used for screen recording and live-streaming.
-- **DaVinci Resolve**: Video editing for project-related content.
+- **OBS**: Used for video presentation.
+- **DaVinci Resolve**: Video editing.
 
 ### License
 
