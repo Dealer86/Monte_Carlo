@@ -14,7 +14,7 @@ Monte Carlo is a simulation and uses CoinGecko API. This fintech app fetches his
 6. Install the required dependencies by running `pip install -r requirements.txt`.
 7. CD into the montecarlo directory where manage.py module lives.
 8. Run: `python manage.py runserver`
-9. Check http://127.0.0.1:8000/.
+9. Check [localhost](http://127.0.0.1:8000/).
 
 ## Technology Stack
 ### Django Web Framework
