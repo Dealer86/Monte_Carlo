@@ -12,8 +12,8 @@
   <body>
     
     <div class="container text-center mt-2 custom-container">
-      <h1>Monte Carlo Simulation for Cryptocurrency Investment</h1>
-      
+      <h3>Monte Carlo Simulation for Cryptocurrency Investment</h3>
+      <br>
       <form method="post" class="form">
         {% csrf_token %}
         
@@ -53,8 +53,12 @@
       .custom-container2 {
           background-color: #ffffff;
           padding: 25px;
-          box-shadow: 0px 0px 7px 0px rgba(0, 0, 0, 0.6);
+          box-shadow: 0px 0px 7px 0px rgba(0, 0, 0, 0.5);
       }
+      h3 {
+      text-shadow: 1px 2.5px 4px rgba(0, 0, 0, 0.267);
+      /* Adjust the values as needed: horizontal offset, vertical offset, blur radius, color */
+    }
   </style>
   <br>
   <div class="container-flex text-center mt-2 custom-container2">
