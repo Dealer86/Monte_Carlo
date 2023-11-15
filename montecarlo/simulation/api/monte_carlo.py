@@ -1,12 +1,53 @@
+"""
+CoinGeckoMonteCarloSimulation Module
+
+This module defines the `CoinGeckoMonteCarloSimulation` class, which performs
+Monte Carlo simulations for predicting the future value of a cryptocurrency investment.
+
+"""
+from datetime import datetime
 import requests
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from datetime import datetime
 import mpld3
 
 
 class CoinGeckoMonteCarloSimulation:
+    """
+    CoinGeckoMonteCarloSimulation Class
+
+    This class performs Monte Carlo simulations for predicting the future value of
+    a cryptocurrency investment based on historical price data obtained from the CoinGecko API.
+
+    Attributes:
+        coin_id (str): The symbol or identifier of the cryptocurrency.
+        years (int): The number of years of historical data to consider.
+        principal_amount (float): The initial principal amount of the investment.
+        investment_horizon (int): The investment horizon in days.
+        num_simulations (int): The number of simulations to perform.
+
+    Methods:
+        fetch_price_data(coin_id, years, return_timestamps=False):
+            Fetches historical cryptocurrency price data from CoinGecko API.
+
+        calculate_log_returns(prices) -> pd.Series:
+            Calculates logarithmic returns from a list of prices.
+
+        monte_carlo_simulation(log_returns, principal_amount, investment_horizon) -> list:
+            Performs Monte Carlo simulations for future value prediction of a cryptocurrency investment.
+
+        run_simulation() -> list:
+            Runs simulations and returns the results.
+
+        visualize_simulation() -> str:
+            Visualizes Monte Carlo simulation results and additional information in HTML format.
+
+        visualize_history_graph() -> str:
+            Visualizes the historical price data graph along with additional information in HTML format.
+
+    """
+
     def __init__(
         self,
         coin_id: str,
@@ -39,7 +80,7 @@ class CoinGeckoMonteCarloSimulation:
 
             # Fetch historical price data from the CoinGecko API
             url = f"https://api.coingecko.com/api/v3/coins/{coin_id}/market_chart?vs_currency=usd&days={days}"
-            response = requests.get(url)
+            response = requests.get(url, timeout=10)
 
             if response.status_code == 200:
                 data = response.json()
@@ -51,7 +92,6 @@ class CoinGeckoMonteCarloSimulation:
                     datetime.fromtimestamp(ts / 1000)
                     for ts in timestamp_in_milliseconds
                 ]
-                # print(timestamps)
                 if not return_timestamps:
                     return prices
                 else:
@@ -59,6 +99,9 @@ class CoinGeckoMonteCarloSimulation:
             else:
                 print(f"Failed to fetch data. Status code: {response.status_code}")
                 return None
+        except requests.Timeout:
+            print("Request timed out. Please try again.")
+            return None
         except requests.exceptions.RequestException as e:
             print(f"Error during API request: {e}")
             return None
@@ -121,7 +164,7 @@ class CoinGeckoMonteCarloSimulation:
             return total_average_simulations
 
         else:
-            print(f"Failed to run simulation")
+            print("Failed to run simulation")
             return []
 
     def visualize_simulation(self) -> str:
@@ -188,6 +231,7 @@ class CoinGeckoMonteCarloSimulation:
 
         # Convert the Matplotlib figure to HTML using mpld3
         graph_html = mpld3.fig_to_html(fig)
+        plt.close(fig)
         return graph_html
 
     def visualize_history_graph(self) -> str:
@@ -249,19 +293,9 @@ class CoinGeckoMonteCarloSimulation:
         # Convert the Matplotlib figure to HTML using mpld3
         history_html = mpld3.fig_to_html(fig)
         plt.close(fig)  # Close the Matplotlib figure to free up resources
-
         return history_html
 
 
 if __name__ == "__main__":
-    # coin_id = str(input("Enter the cryptocurrency symbol: "))
-    # years = int(input("Enter the number of years of historical data to consider: "))
-    # principal_amount = float(input("Enter the initial principal amount: "))
-    # investment_horizon = int(input("Enter the investment horizon (in years): "))
-    # num_simulations = int(input("Enter the number of Monte Carlo simulations: "))
-
-    # run_simulation_and_print_results(coin_id, years, principal_amount, investment_horizon, num_simulations)
     monte_carlo = CoinGeckoMonteCarloSimulation("bitcoin", 1, 1000, 100, 5)
-    # monte_carlo.visualize_average_future_value()
-    # monte_carlo.visualize_simulation()
     monte_carlo.visualize_history_graph()
