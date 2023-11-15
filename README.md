@@ -36,7 +36,7 @@ Monte Carlo is a simulation and uses CoinGecko API. This fintech app fetches his
 ### Testing
 - **Unit Tests**: Using Django's built-in testing framework.
 - **Continuous Integration**: This project uses GitHub Actions for automated continuous integration.
-- Aici CI badge
+- **GitHub Actions Status Badge** [![Django CI](https://github.com/Dealer86/Monte_Carlo/actions/workflows/django.yml/badge.svg)](https://github.com/Dealer86/Monte_Carlo/actions/workflows/django.yml)
 
 ### Third-Party Tools
 - **OBS**: Used for screen recording and live-streaming.
