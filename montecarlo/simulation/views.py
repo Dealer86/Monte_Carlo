@@ -25,7 +25,7 @@ def montecarlo(request):
             except IndexError:
                 messages.error(
                     request,
-                    f"Cryptocurrency symbol {coin_id} is not a valid! Try again ...",
+                    f"Cryptocurrency '{coin_id}' is not valid! Try again ...",
                 )
                 return redirect("montecarlo")
 
