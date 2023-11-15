@@ -56,7 +56,7 @@ class CoinGeckoMonteCarloSimulation:
         investment_horizon: int,
         num_simulations: int,
     ):
-        self.coin_id = coin_id
+        self.coin_id = coin_id.lower()
         self.years = years_of_price_data_to_collect_starting_from_current_year
         self.principal_amount = principal_amount
         self.investment_horizon = investment_horizon
