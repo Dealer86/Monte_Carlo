@@ -1,5 +1,5 @@
 # Monte Carlo
-Monte Carlo is a simulation and uses CoinGecko API. This fintech app fetches historical cryptocurrency price data and performs Monte Carlo simulations for future value prediction of a cryptocurrency investment with logarithmic returns, generating interactive graphs.
+Monte Carlo is a simulation and uses CoinGecko API. This fintech app fetches historical cryptocurrency price data and performs Monte Carlo simulations for future value prediction of a cryptocurrency investment, generating interactive graphs.
 
 ## Video Presentation
 [![Demo Video](https://img.youtube.com/vi/QR5Rr6cAYLE/0.jpg)](https://youtu.be/QR5Rr6cAYLE)
