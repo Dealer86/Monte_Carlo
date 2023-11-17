@@ -6,11 +6,19 @@ Monte Carlo simulations for predicting the future value of a cryptocurrency inve
 
 """
 from datetime import datetime
+import logging
 import requests
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import mpld3
+
+
+logging.basicConfig(
+    filename="finance.log",
+    level=logging.DEBUG,
+    format="%(asctime)s _ %(levelname)s _ %(name)s _ %(message)s",
+)
 
 
 class CoinGeckoMonteCarloSimulation:
@@ -74,6 +82,10 @@ class CoinGeckoMonteCarloSimulation:
             list: A list of historical prices for the specified cryptocurrency.
                 Returns None if there are errors during data retrieval or processing.
         """
+        logging.info(
+            "CoinGeckoMonteCarloSimulation executing fetch_price_data command for crypto %s ...",
+            self.coin_id,
+        )
         try:
             # Calculate the number of data points based on the interval
             days = years * 365
@@ -93,20 +105,31 @@ class CoinGeckoMonteCarloSimulation:
                     for ts in timestamp_in_milliseconds
                 ]
                 if not return_timestamps:
+                    logging.info(
+                        "CoinGeckoMonteCarloSimulation successfully executed fetch_price_data command for crypto %s, returning prices.",
+                        self.coin_id,
+                    )
                     return prices
                 else:
+                    logging.info(
+                        "CoinGeckoMonteCarloSimulation successfully executed fetch_price_data command for crypto %s, returning timestamps and prices.",
+                        self.coin_id,
+                    )
                     return timestamps, prices
             else:
-                print(f"Failed to fetch data. Status code: {response.status_code}")
+                logging.warning(
+                    "CoinGeckoMonteCarloSimulation failed to execute fetch_price_data. Status code: %s",
+                    response.status_code,
+                )
                 return None
         except requests.Timeout:
-            print("Request timed out. Please try again.")
+            logging.error("Request timed out. Please try again.")
             return None
         except requests.exceptions.RequestException as e:
-            print(f"Error during API request: {e}")
+            logging.error("Error during API request: %s", str(e))
             return None
         except (KeyError, ValueError) as e:
-            print(f"Error while processing data: {e}")
+            logging.error("Error while processing data: %s", str(e))
             return None
 
     def calculate_log_returns(self, prices) -> pd.Series:
@@ -120,8 +143,14 @@ class CoinGeckoMonteCarloSimulation:
             pd.Series: Logarithmic returns.
 
         """
+        logging.info(
+            "CoinGeckoMonteCarloSimulation executing calculate_log_returns command ..."
+        )
         price_df = pd.Series(prices)
         log_returns = np.log(price_df / price_df.shift(1))
+        logging.info(
+            "CoinGeckoMonteCarloSimulation successfully executed calculate_log_returns command."
+        )
         return log_returns.dropna()
 
     def monte_carlo_simulation(
@@ -138,6 +167,9 @@ class CoinGeckoMonteCarloSimulation:
         Returns:
             list: List of future values from Monte Carlo simulations
         """
+        logging.info(
+            "CoinGeckoMonteCarloSimulation executing monte_carlo_simulation command ..."
+        )
         returns = []
         for _ in range(self.num_simulations):
             random_log_returns = np.random.normal(
@@ -146,6 +178,9 @@ class CoinGeckoMonteCarloSimulation:
             future_values = np.exp(np.cumsum(random_log_returns))
             final_value = principal_amount * future_values[-1]
             returns.append(final_value)
+        logging.info(
+            "CoinGeckoMonteCarloSimulation successfully executed monte_carlo_simulation command."
+        )
         return returns
 
     def run_simulation(self) -> list:
@@ -155,16 +190,27 @@ class CoinGeckoMonteCarloSimulation:
         Returns:
             list: List of future values from Monte Carlo simulations.
         """
+        logging.info(
+            "CoinGeckoMonteCarloSimulation executing run_simulation command for crypto %s...",
+            self.coin_id,
+        )
         prices = self.fetch_price_data(self.coin_id, self.years)
         if prices is not None:
             log_returns = self.calculate_log_returns(prices)
             total_average_simulations = self.monte_carlo_simulation(
                 log_returns, self.principal_amount, self.investment_horizon
             )
+            logging.info(
+                "CoinGeckoMonteCarloSimulation successfully executed run_simulation command for crypto %s.",
+                self.coin_id,
+            )
             return total_average_simulations
 
         else:
-            print("Failed to run simulation")
+            logging.warning(
+                "CoinGeckoMonteCarloSimulation failed to execute run_simulation for crypto %s. Will return empty list.",
+                self.coin_id,
+            )
             return []
 
     def visualize_simulation(self) -> str:
@@ -174,6 +220,10 @@ class CoinGeckoMonteCarloSimulation:
         Returns:
             str: HTML representation of the simulation visualization.
         """
+        logging.info(
+            "CoinGeckoMonteCarloSimulation executing visualize_simulation command for crypto %s...",
+            self.coin_id,
+        )
         average_future_values = self.run_simulation()
         simulation_number = list(range(1, len(average_future_values) + 1))
 
@@ -232,6 +282,10 @@ class CoinGeckoMonteCarloSimulation:
         # Convert the Matplotlib figure to HTML using mpld3
         graph_html = mpld3.fig_to_html(fig)
         plt.close(fig)
+        logging.info(
+            "CoinGeckoMonteCarloSimulation successfully executed visualize_simulation command for crypto %s.",
+            self.coin_id,
+        )
         return graph_html
 
     def visualize_history_graph(self) -> str:
@@ -241,6 +295,10 @@ class CoinGeckoMonteCarloSimulation:
         Returns:
             str: HTML representation of the history graph visualization.
         """
+        logging.info(
+            "CoinGeckoMonteCarloSimulation executing visualize_history_graph command for crypto %s...",
+            self.coin_id,
+        )
         timestamps, prices = self.fetch_price_data(
             coin_id=self.coin_id, years=self.years, return_timestamps=True
         )
@@ -293,6 +351,10 @@ class CoinGeckoMonteCarloSimulation:
         # Convert the Matplotlib figure to HTML using mpld3
         history_html = mpld3.fig_to_html(fig)
         plt.close(fig)  # Close the Matplotlib figure to free up resources
+        logging.info(
+            "CoinGeckoMonteCarloSimulation successfully executed visualize_history_graph command for crypto %s.",
+            self.coin_id,
+        )
         return history_html
 
 
