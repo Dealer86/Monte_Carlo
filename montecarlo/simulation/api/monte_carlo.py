@@ -11,8 +11,10 @@ import requests
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib
 import mpld3
 
+matplotlib.use("Agg")  # Use Agg backend to avoid GUI-related issues
 
 logging.basicConfig(
     filename="finance.log",
