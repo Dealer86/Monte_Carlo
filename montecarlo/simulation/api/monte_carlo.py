@@ -316,6 +316,9 @@ class CoinGeckoMonteCarloSimulation:
         min_price = history_graph["Prices"].min()
         max_price = history_graph["Prices"].max()
         average_price = history_graph["Prices"].mean()
+        today_price = prices[-1]
+        yesterday_price = prices[-3]
+        today_date = timestamps[-1]
 
         # Find the index of the maximum value in the 'Prices' column
         max_price_index = history_graph["Prices"].idxmax()
@@ -324,18 +327,21 @@ class CoinGeckoMonteCarloSimulation:
         # Use the index to get the corresponding timestamp
         timestamp_max_price = history_graph.loc[max_price_index, "Timestamps"]
         timestamp_min_price = history_graph.loc[min_price_index, "Timestamps"]
-
+    
         # Add extra information at the top of the graph
         extra_info = [
             f"Cryptocurrency: {self.coin_id.capitalize()}",
             f"Years of Price Data Collected: {self.years} years",
+            f"Today's Price: {today_price:.2f}$ vs "
+            f"Yesterday's Price: {yesterday_price:.2f}$",
+            f"Last update: {today_date}",
             f"Maximum Price and date: {max_price:.2f}$ on {timestamp_max_price}",
             f"Minimum Price and date: {min_price:.2f}$ on {timestamp_min_price}",
             f"Average price per {self.years} years: {average_price:.2f}$",
         ]
 
         # Set the y-coordinate for the text
-        y_coord = 1.1
+        y_coord = 1.15
 
         # Iterate over each line of text and place it on a different row
         for line in extra_info:
@@ -348,7 +354,7 @@ class CoinGeckoMonteCarloSimulation:
                 va="center",
                 fontsize=14,
             )
-            y_coord -= 0.02  # Adjust this value to control the spacing between rows
+            y_coord -= 0.017  # Adjust this value to control the spacing between rows
 
         # Convert the Matplotlib figure to HTML using mpld3
         history_html = mpld3.fig_to_html(fig)
