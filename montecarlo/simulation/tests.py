@@ -88,7 +88,7 @@ class CoinGeckoMonteCarloSimulationTests(TestCase):
         with patch.object(
             CoinGeckoMonteCarloSimulation,
             "fetch_price_data",
-            return_value=([datetime(2022, 1, 1), datetime(2022, 1, 2)], [100, 120]),
+            return_value=([datetime(2022, 1, 1), datetime(2022, 1, 2), datetime(2022, 1, 3)], [100, 120, 99]),
         ):
             history_html = self.coin_gecko.visualize_history_graph()
 
